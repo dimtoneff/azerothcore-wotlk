@@ -1273,7 +1273,7 @@ public:
     int32 CalculateAOEDamageReduction(int32 damage, uint32 schoolMask, bool npcCaster) const;
 
     // Armor reduction
-    static bool IsDamageReducedByArmor(SpellSchoolMask damageSchoolMask, SpellInfo const* spellInfo = nullptr, uint8 effIndex = MAX_SPELL_EFFECTS);
+    static bool IsDamageReducedByArmor(SpellSchoolMask damageSchoolMask, SpellInfo const* spellInfo = nullptr);
     static uint32 CalcArmorReducedDamage(Unit const* attacker, Unit const* victim, const uint32 damage, SpellInfo const* spellInfo, uint8 attackerLevel = 0, WeaponAttackType attackType = MAX_ATTACK);
 
     // Resilience reduction - player or player's pet resilience (-1%), cap 100%

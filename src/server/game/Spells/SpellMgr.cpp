@@ -3311,6 +3311,11 @@ void SpellMgr::LoadSpellInfoCustomAttributes()
         if (!spellInfo)
             continue;
 
+        // spells carrying a bleed effect ignore armor entirely: the direct damage path aggregates all
+        // effects into one value, so it cannot tell which effect produced the damage
+        if (spellInfo->GetAllEffectsMechanicMask() & (1ULL << MECHANIC_BLEED))
+            spellInfo->AttributesCu |= SPELL_ATTR0_CU_IGNORE_ARMOR;
+
         for (uint8 j = 0; j < MAX_SPELL_EFFECTS; ++j)
         {
             switch (spellInfo->Effects[j].ApplyAuraName)
