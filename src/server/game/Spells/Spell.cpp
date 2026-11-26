@@ -4139,9 +4139,10 @@ void Spell::_cast(bool skipCheck)
 
     // CAST -> HIT -> FINISH ordering: fire CAST before handle_immediate so an aura
     // applied during HIT (e.g. Arcane Potency from Clearcasting) isn't consumed by
-    // the same cast. Triggered spells skip this so periodic ticks (Blizzard etc.)
-    // don't burn cast-charge buffs.
-    if (m_originalCaster && !IsTriggered())
+    // the same cast. Triggered spells normally skip CAST, except those with the DBC
+    // "allow triggered spell to trigger" attribute (SPELL_ATTR3_NOT_A_PROC).
+    // Periodic ticks without it stay blocked so cast-charge auras aren't consumed.
+    if (m_originalCaster && (!IsTriggered() || m_spellInfo->HasAttribute(SPELL_ATTR3_NOT_A_PROC)))
     {
         uint32 procAttacker = m_procAttacker;
         if (!procAttacker)
