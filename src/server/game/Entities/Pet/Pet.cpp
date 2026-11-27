@@ -1308,18 +1308,11 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
                         }
                     case NPC_TREANT: //force of nature
                         {
-                            SetCreateHealth(30 + 30 * petlevel);
+                            if (!pInfo)
+                                SetCreateHealth(30 + 30 * petlevel);
 
-                            if (pInfo)
-                            {
-                                SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, float(pInfo->min_dmg));
-                                SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, float(pInfo->max_dmg));
-                            }
-                            else
-                            {
-                                SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, float(petlevel * 2.5f - petlevel));
-                                SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, float(petlevel * 2.5f + petlevel));
-                            }
+                            SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, float(petlevel * 2.5f - petlevel));
+                            SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, float(petlevel * 2.5f + petlevel));
 
                             AddAura(SPELL_PET_AVOIDANCE, this);
                             AddAura(SPELL_HUNTER_PET_SCALING_04, this);
