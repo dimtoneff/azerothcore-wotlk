@@ -307,7 +307,7 @@ class spell_dru_brambles_treant : public AuraScript
         return false;
     }
 
-    void CalculateAmount(AuraEffect const* /*aurEff*/, int32& amount, bool& /*canBeRecalculated*/)
+    void CalculateAmount(AuraEffect const* /*aurEff*/, int32& amount, bool& canBeRecalculated)
     {
         // xinef: chance of success stores proper amount of damage increase
         // xinef: little hack because GetSpellModOwner will return nullptr pointer at this point (early summoning stage)
@@ -315,6 +315,8 @@ class spell_dru_brambles_treant : public AuraScript
             if (Unit* owner = GetUnitOwner()->ToTempSummon()->GetSummonerUnit())
                 if (Player* player = owner->GetSpellModOwner())
                     player->ApplySpellMod(SPELL_DRUID_BARKSKIN, SPELLMOD_CHANCE_OF_SUCCESS, amount);
+
+        canBeRecalculated = false;
     }
 
     void Register() override
@@ -396,32 +398,16 @@ class spell_dru_treant_scaling : public AuraScript
         }
     }
 
-    void CalculateAPAmount(AuraEffect const*  /*aurEff*/, int32& amount, bool& /*canBeRecalculated*/)
+    void CalculateAPAmount(AuraEffect const*  /*aurEff*/, int32& amount, bool& canBeRecalculated)
     {
-        // xinef: treant inherits 105% of SP as AP - 15% of damage increase per hit
+        // xinef: treant inherits 100% of SP as AP
         if (Unit* owner = GetUnitOwner()->GetOwner())
         {
             int32 nature = owner->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_NATURE);
-            amount = CalculatePct(std::max<int32>(0, nature), 105);
-
-            // xinef: brambles talent
-            if (AuraEffect const* bramblesEff = owner->GetAuraEffect(SPELL_AURA_ADD_FLAT_MODIFIER, SPELLFAMILY_DRUID, 53, 2))
-                AddPct(amount, bramblesEff->GetAmount());
+            amount = CalculatePct(std::max<int32>(0, nature), 100);
         }
-    }
 
-    void CalculateSPAmount(AuraEffect const*  /*aurEff*/, int32& amount, bool& /*canBeRecalculated*/)
-    {
-        // xinef: treant inherits 15% of SP
-        if (Unit* owner = GetUnitOwner()->GetOwner())
-        {
-            int32 nature = owner->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_NATURE);
-            amount = CalculatePct(std::max<int32>(0, nature), 15);
-
-            // xinef: Update appropriate player field
-            if (owner->IsPlayer())
-                owner->SetUInt32Value(PLAYER_PET_SPELL_POWER, (uint32)amount);
-        }
+        canBeRecalculated = false;
     }
 
     void HandleEffectApply(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
@@ -444,7 +430,6 @@ class spell_dru_treant_scaling : public AuraScript
         if (m_scriptSpellId == 35669)
         {
             DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_dru_treant_scaling::CalculateAPAmount, EFFECT_ALL, SPELL_AURA_MOD_ATTACK_POWER);
-            DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_dru_treant_scaling::CalculateSPAmount, EFFECT_ALL, SPELL_AURA_MOD_DAMAGE_DONE);
         }
 
         OnEffectApply += AuraEffectApplyFn(spell_dru_treant_scaling::HandleEffectApply, EFFECT_ALL, SPELL_AURA_ANY, AURA_EFFECT_HANDLE_REAL);
