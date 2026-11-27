@@ -400,11 +400,15 @@ class spell_dru_treant_scaling : public AuraScript
 
     void CalculateAPAmount(AuraEffect const*  /*aurEff*/, int32& amount, bool& canBeRecalculated)
     {
-        // xinef: treant inherits 100% of SP as AP
+        // xinef: treant inherits 105% of SP as AP
         if (Unit* owner = GetUnitOwner()->GetOwner())
         {
             int32 nature = owner->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_NATURE);
-            amount = CalculatePct(std::max<int32>(0, nature), 100);
+            amount = CalculatePct(std::max<int32>(0, nature), 105);
+
+            // xinef: brambles talent (probably double dipping with spell_dru_brambles_treant::CalculateAmount)
+            if (AuraEffect const* bramblesEff = owner->GetAuraEffect(SPELL_AURA_ADD_FLAT_MODIFIER, SPELLFAMILY_DRUID, 53, 2))
+                AddPct(amount, bramblesEff->GetAmount());
         }
 
         canBeRecalculated = false;
